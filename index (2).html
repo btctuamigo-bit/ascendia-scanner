@@ -1,0 +1,881 @@
+<!DOCTYPE html>
+<html lang="es" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ascendia Scanner — Asciende tus inversiones</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300..700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --text-xs:clamp(0.75rem,0.7rem + 0.25vw,0.875rem);
+  --text-sm:clamp(0.875rem,0.8rem + 0.35vw,1rem);
+  --text-base:clamp(1rem,0.95rem + 0.25vw,1.125rem);
+  --text-lg:clamp(1.125rem,1rem + 0.75vw,1.5rem);
+  --text-xl:clamp(1.5rem,1.2rem + 1.25vw,2.25rem);
+  --sp1:.25rem;--sp2:.5rem;--sp3:.75rem;--sp4:1rem;--sp5:1.25rem;--sp6:1.5rem;--sp8:2rem;
+  --r-sm:.375rem;--r-md:.5rem;--r-lg:.75rem;--r-xl:1rem;--r-full:9999px;
+  --t:180ms cubic-bezier(0.16,1,0.3,1);
+  --font:"Inter","Helvetica Neue",sans-serif;
+  --mono:"JetBrains Mono","Courier New",monospace;
+}
+[data-theme="dark"]{
+  --bg:#0e0d0c;--sf:#131211;--sf2:#181716;--sfo:#1c1b19;--sfd:#272624;
+  --div:#1f1e1c;--brd:#2c2b28;
+  --tx:#d0cfc9;--txm:#686764;--txf:#3a3936;
+  --pr:#3d9ea8;--prh:#2d8a94;--prhl:#182e30;
+  --gr:#6daa45;--grhl:rgba(109,170,69,0.18);
+  --rd:#d163a7;--rdhl:rgba(209,99,167,0.18);
+  --gd:#e8af34;--gdhl:rgba(232,175,52,0.18);
+  --bl:#5591c7;--blhl:rgba(85,145,199,0.18);
+  --sh1:0 1px 2px rgba(0,0,0,.35);--sh2:0 4px 12px rgba(0,0,0,.45);
+}
+[data-theme="light"]{
+  --bg:#f7f6f2;--sf:#f9f8f5;--sf2:#fbfbf9;--sfo:#f0ede8;--sfd:#e6e4df;
+  --div:#dcd9d5;--brd:#d4d1ca;
+  --tx:#28251d;--txm:#7a7974;--txf:#bab9b4;
+  --pr:#01696f;--prh:#0c4e54;--prhl:#cedcd8;
+  --gr:#437a22;--grhl:rgba(67,122,34,0.12);
+  --rd:#a12c7b;--rdhl:rgba(161,44,123,0.12);
+  --gd:#b07a00;--gdhl:rgba(176,122,0,0.12);
+  --bl:#006494;--blhl:rgba(0,100,148,0.12);
+  --sh1:0 1px 2px rgba(0,0,0,.06);--sh2:0 4px 12px rgba(0,0,0,.09);
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+html{-webkit-font-smoothing:antialiased;}
+body{min-height:100dvh;font-family:var(--font);font-size:var(--text-sm);color:var(--tx);background:var(--bg);line-height:1.6;}
+button{cursor:pointer;background:none;border:none;font:inherit;color:inherit;}
+input,select{font:inherit;}
+
+/* LAYOUT */
+.shell{display:grid;grid-template-columns:220px 1fr;grid-template-rows:54px 1fr;min-height:100dvh;max-height:100dvh;overflow:hidden;}
+
+/* TOPBAR */
+.topbar{grid-column:1/-1;display:flex;align-items:center;gap:var(--sp4);padding:0 var(--sp5);background:var(--sf);border-bottom:1px solid var(--brd);z-index:50;}
+.logo{display:flex;align-items:center;gap:var(--sp3);min-width:190px;border-right:1px solid var(--brd);padding-right:var(--sp5);margin-right:var(--sp2);}
+.logo-icon{width:28px;height:28px;background:var(--pr);border-radius:var(--r-md);display:flex;align-items:center;justify-content:center;color:#fff;font-size:14px;font-weight:700;flex-shrink:0;}
+.logo-name{font-weight:700;font-size:var(--text-sm);color:var(--tx);}
+.logo-tag{font-size:9px;font-weight:700;background:var(--prhl);color:var(--pr);padding:2px 6px;border-radius:var(--r-sm);text-transform:uppercase;letter-spacing:.06em;}
+.tb-search{flex:1;max-width:420px;position:relative;}
+.tb-search input{width:100%;background:var(--sfo);border:1px solid var(--brd);border-radius:var(--r-md);padding:6px 12px 6px 34px;font-size:var(--text-xs);color:var(--tx);}
+.tb-search input::placeholder{color:var(--txm);}
+.tb-search input:focus{outline:none;border-color:var(--pr);}
+.tb-icon{position:absolute;left:10px;top:50%;transform:translateY(-50%);color:var(--txm);font-size:15px;pointer-events:none;}
+.tb-right{margin-left:auto;display:flex;align-items:center;gap:var(--sp3);}
+.mkt-bar{display:flex;align-items:center;gap:var(--sp4);padding:4px 14px;background:var(--sfo);border:1px solid var(--brd);border-radius:var(--r-md);font-size:10px;}
+.mkt-i{display:flex;align-items:center;gap:6px;}
+.mkt-l{color:var(--txm);font-weight:500;}
+.mkt-v{font-family:var(--mono);font-weight:600;color:var(--tx);}
+.live{width:6px;height:6px;border-radius:50%;background:var(--gr);animation:pulse 2s infinite;}
+@keyframes pulse{0%,100%{opacity:1;}50%{opacity:.3;}}
+.icon-btn{width:30px;height:30px;display:flex;align-items:center;justify-content:center;border-radius:var(--r-md);color:var(--txm);transition:background var(--t);font-size:17px;}
+.icon-btn:hover{background:var(--sfo);color:var(--tx);}
+
+/* SIDEBAR */
+.sidebar{background:var(--sf);border-right:1px solid var(--brd);display:flex;flex-direction:column;overflow-y:auto;padding:var(--sp3) 0;}
+.nav-sec{padding:var(--sp3) var(--sp4) var(--sp1);}
+.nav-lbl{font-size:9px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--txf);padding:0 var(--sp2) var(--sp2);}
+.nav-item{display:flex;align-items:center;gap:10px;width:100%;padding:7px var(--sp3);border-radius:var(--r-md);font-size:var(--text-xs);color:var(--txm);text-align:left;margin-bottom:1px;transition:background var(--t),color var(--t);cursor:pointer;}
+.nav-item:hover{background:var(--sfo);color:var(--tx);}
+.nav-item.active{background:var(--prhl);color:var(--pr);font-weight:500;}
+.nav-cnt{margin-left:auto;font-size:9px;font-weight:600;padding:1px 6px;border-radius:var(--r-full);background:var(--sfd);color:var(--txm);}
+.nav-hr{border:none;border-top:1px solid var(--div);margin:var(--sp3) var(--sp4);}
+.sidebar-foot{margin-top:auto;padding:var(--sp4);}
+.user-pill{display:flex;align-items:center;gap:var(--sp3);padding:var(--sp3);background:var(--sfo);border-radius:var(--r-lg);cursor:pointer;}
+.av{width:28px;height:28px;border-radius:50%;background:var(--pr);display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:#fff;flex-shrink:0;}
+.u-name{font-size:var(--text-xs);font-weight:600;color:var(--tx);}
+.u-plan{font-size:10px;color:var(--txm);}
+
+/* MAIN */
+.main{overflow-y:auto;padding:var(--sp5) var(--sp6);display:flex;flex-direction:column;gap:var(--sp5);}
+.page{display:none;}
+.page.active{display:flex;flex-direction:column;gap:var(--sp5);}
+.ph{display:flex;align-items:flex-start;justify-content:space-between;flex-wrap:wrap;gap:var(--sp4);}
+.ph-title{font-size:var(--text-xl);font-weight:700;color:var(--tx);line-height:1.1;}
+.ph-sub{font-size:var(--text-xs);color:var(--txm);margin-top:4px;}
+.btn{display:inline-flex;align-items:center;gap:var(--sp2);padding:7px var(--sp4);border-radius:var(--r-md);font-size:var(--text-xs);font-weight:500;border:1px solid transparent;white-space:nowrap;transition:background var(--t);}
+.btn-p{background:var(--pr);color:#fff;}
+.btn-p:hover{background:var(--prh);}
+.btn-g{background:var(--sfo);color:var(--tx);border-color:var(--brd);}
+.btn-g:hover{background:var(--sfd);}
+
+/* KPI */
+.kpi-row{display:grid;grid-template-columns:repeat(5,1fr);gap:var(--sp4);}
+.kpi{background:var(--sf);border:1px solid var(--brd);border-radius:var(--r-lg);padding:var(--sp4) var(--sp5);box-shadow:var(--sh1);}
+.kpi-lbl{font-size:10px;color:var(--txm);font-weight:500;margin-bottom:var(--sp2);}
+.kpi-val{font-size:var(--text-xl);font-weight:700;color:var(--tx);line-height:1;}
+.kpi-meta{font-size:10px;color:var(--txm);margin-top:var(--sp2);}
+
+/* SEARCH BIG */
+.search-big{background:var(--sf);border:1px solid var(--brd);border-radius:var(--r-xl);padding:var(--sp5);box-shadow:var(--sh1);}
+.sb-row{display:flex;gap:var(--sp3);}
+.sb-input{flex:1;background:var(--sfo);border:1px solid var(--brd);border-radius:var(--r-md);padding:11px var(--sp4);font-size:var(--text-base);font-weight:700;color:var(--tx);letter-spacing:2px;text-transform:uppercase;font-family:var(--mono);}
+.sb-input::placeholder{font-weight:400;letter-spacing:0;text-transform:none;font-size:var(--text-xs);}
+.sb-input:focus{outline:none;border-color:var(--pr);}
+.sb-btn{padding:11px var(--sp6);background:var(--pr);color:#fff;border-radius:var(--r-md);font-weight:700;font-size:var(--text-xs);display:flex;align-items:center;gap:var(--sp2);transition:background var(--t);letter-spacing:.03em;}
+.sb-btn:hover{background:var(--prh);}
+.sb-btn:disabled{opacity:.5;cursor:not-allowed;}
+.chips{display:flex;gap:var(--sp2);margin-top:var(--sp3);flex-wrap:wrap;align-items:center;}
+.chip-lbl{font-size:10px;color:var(--txm);font-weight:500;}
+.chip{display:inline-flex;align-items:center;padding:4px 12px;border-radius:var(--r-full);font-size:10px;font-weight:600;cursor:pointer;border:1px solid var(--brd);background:var(--sfo);color:var(--txm);transition:all var(--t);}
+.chip:hover{background:var(--sfd);color:var(--tx);border-color:var(--pr);}
+
+/* LOADING */
+.load-box{background:var(--sf);border:1px solid var(--brd);border-radius:var(--r-xl);padding:var(--sp8);text-align:center;display:none;}
+.load-box.show{display:block;}
+.spin{width:40px;height:40px;border:3px solid var(--brd);border-top-color:var(--pr);border-radius:50%;animation:spin .8s linear infinite;margin:0 auto var(--sp4);}
+@keyframes spin{to{transform:rotate(360deg);}}
+.load-steps{display:flex;flex-direction:column;gap:var(--sp2);align-items:center;margin-top:var(--sp3);}
+.lst{font-size:11px;color:var(--pr);}
+
+/* ERROR */
+.err-box{background:var(--rdhl);border:1px solid var(--rd);border-radius:var(--r-lg);padding:var(--sp4);color:var(--rd);font-size:var(--text-xs);display:none;}
+.err-box.show{display:block;}
+
+/* RESULTS */
+.results{display:none;flex-direction:column;gap:var(--sp4);}
+.results.show{display:flex;}
+
+/* HERO */
+.sig-hero{background:var(--sf);border:1px solid var(--brd);border-radius:var(--r-xl);padding:var(--sp5);box-shadow:var(--sh1);position:relative;overflow:hidden;}
+.sig-hero::before{content:"";position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--pr),var(--bl));}
+.sig-layout{display:flex;align-items:center;gap:var(--sp6);flex-wrap:wrap;}
+.sig-info{flex:1;min-width:200px;}
+.sig-ticker{font-size:30px;font-weight:800;font-family:var(--mono);color:var(--tx);line-height:1;}
+.sig-name{font-size:var(--text-xs);color:var(--txm);margin-top:2px;}
+.sig-price{font-size:38px;font-weight:700;font-family:var(--mono);color:var(--tx);margin-top:var(--sp3);line-height:1;}
+.sig-chg{font-size:var(--text-sm);font-weight:600;font-family:var(--mono);margin-top:4px;}
+.sig-meta{display:flex;gap:var(--sp3);margin-top:var(--sp4);flex-wrap:wrap;}
+.meta-chip{padding:4px 12px;background:var(--sfo);border:1px solid var(--brd);border-radius:var(--r-full);font-size:10px;font-weight:600;color:var(--txm);}
+.sig-badge{text-align:center;padding:var(--sp5) var(--sp8);border-radius:var(--r-xl);border:2px solid;min-width:180px;}
+.sig-badge.buy{background:var(--grhl);border-color:var(--gr);}
+.sig-badge.sell{background:var(--rdhl);border-color:var(--rd);}
+.sig-badge.hold{background:var(--gdhl);border-color:var(--gd);}
+.sig-lbl{font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--txm);margin-bottom:var(--sp2);}
+.sig-txt{font-size:26px;font-weight:800;}
+.sig-txt.buy{color:var(--gr);}
+.sig-txt.sell{color:var(--rd);}
+.sig-txt.hold{color:var(--gd);}
+.sig-sc{font-size:12px;color:var(--txm);margin-top:var(--sp2);}
+.sc-track{height:5px;background:var(--sfd);border-radius:var(--r-full);overflow:hidden;margin-top:var(--sp2);}
+.sc-fill{height:100%;border-radius:var(--r-full);transition:width 1s ease;}
+.sc-fill.buy{background:var(--gr);}
+.sc-fill.sell{background:var(--rd);}
+.sc-fill.hold{background:var(--gd);}
+
+/* GRID */
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:var(--sp4);}
+
+/* CARD */
+.scard{background:var(--sf);border:1px solid var(--brd);border-radius:var(--r-xl);padding:var(--sp4) var(--sp5);box-shadow:var(--sh1);}
+.scard-title{font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--txm);margin-bottom:var(--sp4);display:flex;align-items:center;justify-content:space-between;}
+
+/* ROWS */
+.ind-row{display:flex;justify-content:space-between;align-items:center;padding:7px 0;border-bottom:1px solid var(--div);}
+.ind-row:last-child{border-bottom:none;}
+.ind-l{font-size:12px;color:var(--txm);}
+.ind-v{font-size:12px;font-weight:600;font-family:var(--mono);color:var(--tx);}
+.ind-b{font-size:9px;font-weight:700;padding:2px 8px;border-radius:var(--r-full);}
+.ind-b.bull{background:var(--grhl);color:var(--gr);}
+.ind-b.bear{background:var(--rdhl);color:var(--rd);}
+.ind-b.neut{background:var(--gdhl);color:var(--gd);}
+
+/* INSIDER / NEWS */
+.ins-item{padding:var(--sp3) 0;border-bottom:1px solid var(--div);}
+.ins-item:last-child{border-bottom:none;}
+.ins-top{display:flex;justify-content:space-between;align-items:flex-start;}
+.ins-name{font-size:12px;font-weight:600;color:var(--tx);}
+.ins-role{font-size:10px;color:var(--txm);}
+.ins-b{font-size:9px;font-weight:700;padding:2px 8px;border-radius:var(--r-full);}
+.ins-b.buy{background:var(--grhl);color:var(--gr);}
+.ins-b.sell{background:var(--rdhl);color:var(--rd);}
+.ins-val{font-size:11px;color:var(--txm);font-family:var(--mono);margin-top:2px;}
+.news-item{padding:var(--sp3) 0;border-bottom:1px solid var(--div);}
+.news-item:last-child{border-bottom:none;}
+.news-ttl{font-size:12px;color:var(--tx);line-height:1.4;margin-bottom:4px;}
+.news-meta{display:flex;align-items:center;gap:var(--sp3);}
+.news-src{font-size:10px;color:var(--txm);}
+.news-sent{font-size:9px;font-weight:700;padding:1px 7px;border-radius:var(--r-full);}
+.news-sent.pos{background:var(--grhl);color:var(--gr);}
+.news-sent.neg{background:var(--rdhl);color:var(--rd);}
+.news-sent.neu{background:var(--gdhl);color:var(--gd);}
+
+/* AI BOX */
+.ai-box{background:var(--sfo);border-radius:var(--r-md);padding:var(--sp4);font-size:12px;color:var(--txm);line-height:1.85;white-space:pre-line;border-left:3px solid var(--pr);}
+
+/* SEÑALES ACTIVAS */
+.signal-card{background:var(--sf);border:1px solid var(--brd);border-radius:var(--r-xl);overflow:hidden;box-shadow:var(--sh1);margin-bottom:var(--sp3);}
+.sc-head{display:flex;align-items:center;justify-content:space-between;padding:var(--sp4) var(--sp5);border-bottom:1px solid var(--div);}
+.sc-ticker{font-size:16px;font-weight:800;font-family:var(--mono);}
+.sc-name{font-size:11px;color:var(--txm);}
+.sc-body{padding:var(--sp4) var(--sp5);}
+.sc-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:var(--sp3);margin-bottom:var(--sp4);}
+.sc-stat{text-align:center;}
+.sc-stat-l{font-size:9px;color:var(--txm);text-transform:uppercase;letter-spacing:.06em;margin-bottom:2px;}
+.sc-stat-v{font-size:13px;font-weight:700;font-family:var(--mono);}
+.sc-rec{background:var(--sfo);border-radius:var(--r-md);padding:var(--sp3) var(--sp4);border-left:3px solid var(--pr);}
+.sc-rec-lbl{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--txm);margin-bottom:4px;}
+.sc-rec-txt{font-size:12px;color:var(--tx);line-height:1.5;}
+.sc-foot{display:flex;align-items:center;justify-content:space-between;padding:var(--sp3) var(--sp5);border-top:1px solid var(--div);background:var(--sf2);}
+.sc-estado{font-size:10px;font-weight:700;padding:2px 10px;border-radius:var(--r-full);}
+.sc-estado.activa{background:var(--grhl);color:var(--gr);}
+.sc-estado.cerrada{background:var(--sfd);color:var(--txm);}
+.sc-retorno{font-size:13px;font-weight:700;font-family:var(--mono);}
+.sc-retorno.pos{color:var(--gr);}
+.sc-retorno.neg{color:var(--rd);}
+.sc-date{font-size:10px;color:var(--txm);}
+.lock-overlay{position:relative;}
+.lock-overlay::after{content:"🔒 Disponible en plan AS o superior";position:absolute;inset:0;background:rgba(14,13,12,.85);display:flex;align-items:center;justify-content:center;font-size:12px;color:var(--txm);border-radius:var(--r-xl);backdrop-filter:blur(3px);}
+
+/* WATCHLIST */
+.wl-item{display:flex;align-items:center;justify-content:space-between;padding:var(--sp3) var(--sp4);border-bottom:1px solid var(--div);cursor:pointer;transition:background var(--t);}
+.wl-item:hover{background:var(--sfo);}
+.wl-item:last-child{border-bottom:none;}
+.wl-ticker{font-size:13px;font-weight:700;font-family:var(--mono);min-width:52px;}
+.wl-name{font-size:11px;color:var(--txm);}
+.wl-price{font-family:var(--mono);font-size:13px;font-weight:600;}
+.wl-chg{font-family:var(--mono);font-size:11px;}
+.sig-pill{font-size:9px;font-weight:700;padding:2px 9px;border-radius:var(--r-full);}
+.sig-pill.buy{background:var(--grhl);color:var(--gr);}
+.sig-pill.sell{background:var(--rdhl);color:var(--rd);}
+.sig-pill.hold{background:var(--gdhl);color:var(--gd);}
+
+/* SCREENER */
+.scanner-wrap{background:var(--sf);border:1px solid var(--brd);border-radius:var(--r-lg);overflow:hidden;box-shadow:var(--sh1);}
+.st{width:100%;border-collapse:collapse;}
+.st th{padding:var(--sp3) var(--sp4);text-align:left;font-size:9px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--txm);border-bottom:1px solid var(--brd);background:var(--sfo);}
+.st td{padding:var(--sp3) var(--sp4);font-size:var(--text-xs);border-bottom:1px solid var(--div);vertical-align:middle;white-space:nowrap;}
+.st tr:last-child td{border-bottom:none;}
+.st tbody tr{cursor:pointer;transition:background var(--t);}
+.st tbody tr:hover{background:var(--sfo);}
+
+/* PLANES */
+.plans-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:var(--sp4);}
+.plan-card{background:var(--sf);border:1px solid var(--brd);border-radius:var(--r-xl);padding:var(--sp6);box-shadow:var(--sh1);}
+.plan-card.featured{border:2px solid var(--pr);position:relative;}
+.plan-badge{position:absolute;top:-12px;left:50%;transform:translateX(-50%);background:var(--pr);color:#fff;font-size:10px;font-weight:700;padding:3px 14px;border-radius:var(--r-full);white-space:nowrap;}
+.plan-name{font-size:var(--text-lg);font-weight:800;margin-bottom:var(--sp2);font-family:var(--mono);}
+.plan-price{font-size:34px;font-weight:800;font-family:var(--mono);margin-bottom:4px;}
+.plan-per{font-size:11px;color:var(--txm);margin-bottom:var(--sp4);}
+.plan-divider{border:none;border-top:1px solid var(--div);margin:var(--sp4) 0;}
+.plan-features{list-style:none;display:flex;flex-direction:column;gap:var(--sp3);margin-bottom:var(--sp5);}
+.plan-features li{font-size:12px;color:var(--txm);display:flex;align-items:flex-start;gap:var(--sp2);line-height:1.4;}
+.feat-ok{color:var(--gr);flex-shrink:0;margin-top:1px;}
+.feat-no{color:var(--txf);flex-shrink:0;margin-top:1px;}
+.plan-btn{width:100%;padding:10px;border-radius:var(--r-md);font-weight:600;font-size:var(--text-xs);border:1px solid var(--brd);color:var(--txm);transition:all var(--t);}
+.plan-btn:hover{background:var(--sfo);}
+.plan-btn.primary{background:var(--pr);color:#fff;border-color:var(--pr);}
+.plan-btn.primary:hover{background:var(--prh);}
+
+/* DISCLAIMER */
+.disclaimer{background:var(--gdhl);border:1px solid var(--gd);border-radius:var(--r-lg);padding:var(--sp4) var(--sp5);font-size:11px;color:var(--txm);line-height:1.6;}
+.disclaimer strong{color:var(--gd);}
+
+/* DISCLAIMER FOOTER GLOBAL */
+.disc-footer{text-align:center;padding:var(--sp4) var(--sp6);font-size:10px;color:var(--txf);border-top:1px solid var(--div);line-height:1.5;}
+
+/* RESPONSIVE */
+@media(max-width:1024px){
+  .shell{grid-template-columns:52px 1fr;}
+  .nav-item span,.u-name,.u-plan,.logo-name,.logo-tag{display:none;}
+  .logo{min-width:auto;padding-right:0;border-right:none;}
+  .kpi-row,.plans-grid{grid-template-columns:repeat(2,1fr);}
+  .mkt-bar{display:none;}
+}
+@media(max-width:768px){
+  .shell{grid-template-columns:1fr;}
+  .sidebar{display:none;}
+  .kpi-row,.g2,.plans-grid{grid-template-columns:1fr;}
+  .main{padding:var(--sp4);}
+}
+</style>
+</head>
+<body>
+
+<!-- DISCLAIMER MODAL PRIMERA VEZ -->
+<div id="discModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:200;align-items:center;justify-content:center;backdrop-filter:blur(4px);">
+  <div style="background:var(--sf);border:1px solid var(--brd);border-radius:var(--r-xl);width:min(520px,95vw);padding:var(--sp6);box-shadow:0 12px 40px rgba(0,0,0,.5);">
+    <div style="font-size:20px;font-weight:700;margin-bottom:var(--sp4);">⚠️ Aviso importante</div>
+    <div style="font-size:13px;color:var(--txm);line-height:1.7;margin-bottom:var(--sp5);">
+      <strong style="color:var(--tx);">Ascendia Scanner</strong> es una herramienta de análisis e información con fines <strong style="color:var(--tx);">exclusivamente educativos</strong>.<br><br>
+      Las señales y análisis generados por inteligencia artificial <strong style="color:var(--rd);">no constituyen asesoramiento financiero</strong>, recomendación de inversión ni oferta de compra o venta de activos financieros.<br><br>
+      Toda decisión de inversión es <strong style="color:var(--tx);">responsabilidad exclusiva del usuario</strong>. Invertir en mercados financieros conlleva riesgo de pérdida de capital.
+    </div>
+    <button onclick="acceptDisc()" style="width:100%;padding:12px;background:var(--pr);color:#fff;border:none;border-radius:var(--r-md);font-weight:700;font-size:14px;cursor:pointer;">Entendido — Acceder a Ascendia Scanner</button>
+  </div>
+</div>
+
+<div class="shell">
+
+<!-- TOPBAR -->
+<header class="topbar">
+  <div class="logo">
+    <div class="logo-icon">A</div>
+    <span class="logo-name">Ascendia Scanner</span>
+    <span class="logo-tag">Beta</span>
+  </div>
+  <div class="tb-search">
+    <span class="tb-icon">&#x1F50D;</span>
+    <input type="text" id="topSearch" placeholder="Buscar ticker — AAPL, TSLA, NVDA..." onkeydown="if(event.key==='Enter'){qs('scanInput').value=this.value.toUpperCase();navTo('scanner');startScan();}">
+  </div>
+  <div class="tb-right">
+    <div class="mkt-bar">
+      <span class="live"></span>
+      <div class="mkt-i"><span class="mkt-l">S&amp;P 500</span><span class="mkt-v">5,842</span></div>
+      <div class="mkt-i"><span class="mkt-l">NASDAQ</span><span class="mkt-v">18,230</span></div>
+      <div class="mkt-i"><span class="mkt-l">VIX</span><span class="mkt-v">18.4</span></div>
+    </div>
+    <button class="icon-btn" onclick="toggleTheme()" title="Cambiar tema">&#9728;</button>
+  </div>
+</header>
+
+<!-- SIDEBAR -->
+<nav class="sidebar">
+  <div class="nav-sec">
+    <div class="nav-lbl">Principal</div>
+    <button class="nav-item active" id="nav-home" onclick="navTo('home')">&#x1F3E0; <span>Dashboard</span></button>
+    <button class="nav-item" id="nav-scanner" onclick="navTo('scanner')">&#x1F50D; <span>Analizador</span></button>
+    <button class="nav-item" id="nav-senales" onclick="navTo('senales')">&#x1F4E1; <span>Se&ntilde;ales Activas</span><span class="nav-cnt" id="sig-cnt">3</span></button>
+    <button class="nav-item" id="nav-watchlist" onclick="navTo('watchlist')">&#x2605; <span>Watchlist</span><span class="nav-cnt" id="wl-cnt">0</span></button>
+    <button class="nav-item" id="nav-screener" onclick="navTo('screener')">&#x1F4CB; <span>Screener</span></button>
+  </div>
+  <hr class="nav-hr">
+  <div class="nav-sec">
+    <div class="nav-lbl">Cuenta</div>
+    <button class="nav-item" id="nav-planes" onclick="navTo('planes')">&#x2B50; <span>Planes</span></button>
+  </div>
+  <div class="sidebar-foot">
+    <div class="user-pill">
+      <div class="av">U</div>
+      <div><div class="u-name">Usuario</div><div class="u-plan">Free &middot; 28 d&iacute;as restantes</div></div>
+    </div>
+  </div>
+</nav>
+
+<!-- MAIN -->
+<main class="main">
+
+  <!-- HOME -->
+  <div class="page active" id="page-home">
+    <div class="ph">
+      <div><div class="ph-title">Dashboard</div><div class="ph-sub" id="homeDate"></div></div>
+      <button class="btn btn-p" onclick="navTo('scanner')">+ Nuevo an&aacute;lisis</button>
+    </div>
+    <div class="kpi-row">
+      <div class="kpi"><div class="kpi-lbl">An&aacute;lisis hoy</div><div class="kpi-val" id="kpiAn">0</div><div class="kpi-meta">de 2 disponibles esta semana</div></div>
+      <div class="kpi"><div class="kpi-lbl">Se&ntilde;ales activas</div><div class="kpi-val" style="color:var(--gr)" id="kpiSig">3</div><div class="kpi-meta">en seguimiento ahora</div></div>
+      <div class="kpi"><div class="kpi-lbl">Watchlist</div><div class="kpi-val" id="kpiWl">0</div><div class="kpi-meta">tickers guardados</div></div>
+      <div class="kpi"><div class="kpi-lbl">Se&ntilde;ales compra</div><div class="kpi-val" style="color:var(--gr)" id="kpiBuy">&mdash;</div><div class="kpi-meta">en watchlist</div></div>
+      <div class="kpi"><div class="kpi-lbl">&Uacute;ltimo an&aacute;lisis</div><div class="kpi-val" style="font-size:1.1rem" id="kpiLast">&mdash;</div><div class="kpi-meta" id="kpiLastSig">sin an&aacute;lisis a&uacute;n</div></div>
+    </div>
+    <div class="scard">
+      <div class="scard-title">&#x2605; Watchlist r&aacute;pida</div>
+      <div id="homeWl"><div style="text-align:center;padding:var(--sp8);color:var(--txm);font-size:12px;">Watchlist vac&iacute;a. <button onclick="navTo('scanner')" style="color:var(--pr);text-decoration:underline;cursor:pointer;background:none;border:none;font:inherit;">Analiza un ticker</button> para empezar.</div></div>
+    </div>
+    <div class="disclaimer">
+      <strong>&#x26A0; Aviso legal:</strong> Ascendia Scanner es una herramienta con fines exclusivamente educativos. Las se&ntilde;ales y an&aacute;lisis no constituyen asesoramiento financiero. Toda decisi&oacute;n de inversi&oacute;n es responsabilidad del usuario.
+    </div>
+  </div>
+
+  <!-- ANALIZADOR -->
+  <div class="page" id="page-scanner">
+    <div class="ph">
+      <div><div class="ph-title">Analizador</div><div class="ph-sub">An&aacute;lisis t&eacute;cnico, fundamental e IA con datos reales</div></div>
+    </div>
+    <div class="search-big">
+      <div class="sb-row">
+        <input class="sb-input" type="text" id="scanInput" placeholder="Introduce un ticker — AAPL, TSLA, NVDA, MSFT..." maxlength="10">
+        <button class="sb-btn" id="scanBtn" onclick="startScan()">&#x1F50D; Analizar</button>
+      </div>
+      <div class="chips">
+        <span class="chip-lbl">R&aacute;pido:</span>
+        <span class="chip" onclick="qs('scanInput').value='AAPL';startScan()">AAPL</span>
+        <span class="chip" onclick="qs('scanInput').value='TSLA';startScan()">TSLA</span>
+        <span class="chip" onclick="qs('scanInput').value='NVDA';startScan()">NVDA</span>
+        <span class="chip" onclick="qs('scanInput').value='MSFT';startScan()">MSFT</span>
+        <span class="chip" onclick="qs('scanInput').value='AMZN';startScan()">AMZN</span>
+        <span class="chip" onclick="qs('scanInput').value='META';startScan()">META</span>
+        <span class="chip" onclick="qs('scanInput').value='GOOGL';startScan()">GOOGL</span>
+        <span class="chip" onclick="qs('scanInput').value='JPM';startScan()">JPM</span>
+        <span class="chip" onclick="qs('scanInput').value='AMD';startScan()">AMD</span>
+        <span class="chip" onclick="qs('scanInput').value='NFLX';startScan()">NFLX</span>
+      </div>
+    </div>
+    <div class="load-box" id="loadBox">
+      <div class="spin"></div>
+      <div style="font-size:13px;color:var(--txm)" id="loadTxt">Iniciando...</div>
+      <div class="load-steps" id="loadSteps"></div>
+    </div>
+    <div class="err-box" id="errBox"></div>
+    <div class="results" id="results">
+      <div class="sig-hero">
+        <div class="sig-layout">
+          <div class="sig-info">
+            <div class="sig-ticker" id="rTicker">&mdash;</div>
+            <div class="sig-name" id="rName">&mdash;</div>
+            <div class="sig-price" id="rPrice">&mdash;</div>
+            <div class="sig-chg" id="rChg">&mdash;</div>
+            <div class="sig-meta" id="rMeta"></div>
+          </div>
+          <div class="sig-badge" id="sigBadge">
+            <div class="sig-lbl">Se&ntilde;al Global</div>
+            <div class="sig-txt" id="sigTxt">&mdash;</div>
+            <div class="sig-sc" id="sigSc">&mdash;</div>
+            <div class="sc-track"><div class="sc-fill" id="scFill" style="width:0%"></div></div>
+          </div>
+        </div>
+      </div>
+      <div class="g2">
+        <div class="scard"><div class="scard-title">&#x1F4CA; An&aacute;lisis T&eacute;cnico</div><div id="rTech"></div></div>
+        <div class="scard"><div class="scard-title">&#x1F3E6; Fundamentales</div><div id="rFund"></div></div>
+      </div>
+      <div class="scard"><div class="scard-title">&#x1F4C8; Evoluci&oacute;n de Precio</div><div id="rChart"></div></div>
+      <div class="g2">
+        <div class="scard"><div class="scard-title">&#x1F575; Actividad Insider</div><div id="rIns"></div></div>
+        <div class="scard"><div class="scard-title">&#x1F4F0; Noticias &amp; Sentimiento</div><div id="rNews"></div></div>
+      </div>
+      <div class="scard">
+        <div class="scard-title">
+          &#x1F916; An&aacute;lisis IA &mdash; Resumen Ejecutivo
+          <button id="addWlBtn" class="btn btn-g" style="font-size:10px;padding:4px 12px;" onclick="addToWl()">&#x2605; A&ntilde;adir Watchlist</button>
+        </div>
+        <div class="ai-box" id="rAI">El an&aacute;lisis IA aparecer&aacute; aqu&iacute;...</div>
+        <div style="margin-top:var(--sp3);font-size:10px;color:var(--txf);">&#x26A0; An&aacute;lisis con fines educativos. No es asesoramiento financiero.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SEÑALES ACTIVAS -->
+  <div class="page" id="page-senales">
+    <div class="ph">
+      <div><div class="ph-title">Se&ntilde;ales Activas</div><div class="ph-sub">Seguimiento en tiempo real con recomendaciones IA</div></div>
+    </div>
+    <div class="disclaimer" style="margin-bottom:0;">
+      <strong>&#x26A0; Fines educativos:</strong> Las se&ntilde;ales son generadas por IA con prop&oacute;sitos informativos. No constituyen recomendaciones de inversi&oacute;n.
+    </div>
+
+    <!-- Señal activa visible Free -->
+    <div class="signal-card">
+      <div class="sc-head">
+        <div>
+          <div class="sc-ticker">NVDA</div>
+          <div class="sc-name">NVIDIA Corporation &middot; NASDAQ &middot; Tecnolog&iacute;a</div>
+        </div>
+        <span class="sc-estado activa">&#x25CF; Activa</span>
+      </div>
+      <div class="sc-body">
+        <div class="sc-stats">
+          <div class="sc-stat"><div class="sc-stat-l">Entrada</div><div class="sc-stat-v">$108.40</div></div>
+          <div class="sc-stat"><div class="sc-stat-l">Actual</div><div class="sc-stat-v" style="color:var(--gr)">$115.20</div></div>
+          <div class="sc-stat"><div class="sc-stat-l">Stop Loss</div><div class="sc-stat-v" style="color:var(--rd)">$110.50</div></div>
+          <div class="sc-stat"><div class="sc-stat-l">Take Profit</div><div class="sc-stat-v" style="color:var(--gd)">$128.00</div></div>
+        </div>
+        <div class="sc-rec">
+          <div class="sc-rec-lbl">&#x1F916; Recomendaci&oacute;n IA ahora</div>
+          <div class="sc-rec-txt">AJUSTAR TRAILING STOP &mdash; Sube el stop a $110.50 para asegurar m&iacute;nimo +1.95%. El precio est&aacute; cerca del TP1 en $118. Si rompe con volumen &rarr; considera piramidaci&oacute;n. Si rechaza &rarr; mantener posici&oacute;n.</div>
+        </div>
+      </div>
+      <div class="sc-foot">
+        <div><div class="sc-date">Activada hace 3 d&iacute;as</div><div class="sc-date">Pr&oacute;xima evaluaci&oacute;n: 2h</div></div>
+        <div class="sc-retorno pos">+6.27% &#x25B2;</div>
+      </div>
+    </div>
+
+    <!-- Señales bloqueadas para Free -->
+    <div style="position:relative;">
+      <div class="signal-card" style="opacity:.35;pointer-events:none;">
+        <div class="sc-head">
+          <div><div class="sc-ticker">AAPL</div><div class="sc-name">Apple Inc. &middot; NASDAQ</div></div>
+          <span class="sc-estado activa">&#x25CF; Activa</span>
+        </div>
+        <div class="sc-body">
+          <div class="sc-stats">
+            <div class="sc-stat"><div class="sc-stat-l">Entrada</div><div class="sc-stat-v">$198.20</div></div>
+            <div class="sc-stat"><div class="sc-stat-l">Actual</div><div class="sc-stat-v">$213.40</div></div>
+            <div class="sc-stat"><div class="sc-stat-l">Stop Loss</div><div class="sc-stat-v">$204.00</div></div>
+            <div class="sc-stat"><div class="sc-stat-l">Take Profit</div><div class="sc-stat-v">$228.00</div></div>
+          </div>
+        </div>
+        <div class="sc-foot"><div class="sc-date">Activada hace 8 d&iacute;as</div><div class="sc-retorno pos">+7.67%</div></div>
+      </div>
+      <div style="position:absolute;inset:0;background:rgba(14,13,12,.82);border-radius:var(--r-xl);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:var(--sp3);backdrop-filter:blur(3px);">
+        <div style="font-size:22px;">&#x1F512;</div>
+        <div style="font-size:13px;color:var(--tx);font-weight:600;">Se&ntilde;al disponible en plan AS o superior</div>
+        <div style="font-size:11px;color:var(--txm);">Generada hace 6 horas &mdash; ver&aacute;s las se&ntilde;ales en tiempo real</div>
+        <button onclick="navTo('planes')" class="btn btn-p" style="margin-top:var(--sp2);">Ver planes desde 7&euro;/mes</button>
+      </div>
+    </div>
+
+    <div style="position:relative;">
+      <div class="signal-card" style="opacity:.35;pointer-events:none;">
+        <div class="sc-head">
+          <div><div class="sc-ticker">AMD</div><div class="sc-name">Advanced Micro Devices &middot; NASDAQ</div></div>
+          <span class="sc-estado activa">&#x25CF; Activa</span>
+        </div>
+        <div class="sc-body">
+          <div class="sc-stats">
+            <div class="sc-stat"><div class="sc-stat-l">Entrada</div><div class="sc-stat-v">$92.10</div></div>
+            <div class="sc-stat"><div class="sc-stat-l">Actual</div><div class="sc-stat-v">$98.40</div></div>
+            <div class="sc-stat"><div class="sc-stat-l">Stop Loss</div><div class="sc-stat-v">$88.00</div></div>
+            <div class="sc-stat"><div class="sc-stat-l">Take Profit</div><div class="sc-stat-v">$112.00</div></div>
+          </div>
+        </div>
+        <div class="sc-foot"><div class="sc-date">Activada hace 12 horas</div><div class="sc-retorno pos">+6.84%</div></div>
+      </div>
+      <div style="position:absolute;inset:0;background:rgba(14,13,12,.82);border-radius:var(--r-xl);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:var(--sp3);backdrop-filter:blur(3px);">
+        <div style="font-size:22px;">&#x23F0;</div>
+        <div style="font-size:13px;color:var(--tx);font-weight:600;">Se&ntilde;al con 24h de retraso</div>
+        <div style="font-size:11px;color:var(--txm);">En plan AS la ver&aacute;s en tiempo real &mdash; no te pierdas la entrada</div>
+        <button onclick="navTo('planes')" class="btn btn-p" style="margin-top:var(--sp2);">Actualizar a AS &mdash; 7&euro;/mes</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- WATCHLIST -->
+  <div class="page" id="page-watchlist">
+    <div class="ph">
+      <div><div class="ph-title">Watchlist</div><div class="ph-sub">Tus tickers guardados con se&ntilde;al actualizada</div></div>
+      <button class="btn btn-p" onclick="navTo('scanner')">+ A&ntilde;adir ticker</button>
+    </div>
+    <div class="scard" id="wlContent"><div style="text-align:center;padding:var(--sp8);color:var(--txm);font-size:12px;">Watchlist vac&iacute;a. Analiza un ticker y pulsa &quot;A&ntilde;adir Watchlist&quot;.</div></div>
+  </div>
+
+  <!-- SCREENER -->
+  <div class="page" id="page-screener">
+    <div class="ph">
+      <div><div class="ph-title">Screener</div><div class="ph-sub">Filtra las mejores oportunidades del mercado</div></div>
+      <button class="btn btn-p" onclick="runScreener()">&#x1F50D; Filtrar</button>
+    </div>
+    <div class="scard">
+      <div class="scard-title">Filtros</div>
+      <div style="display:flex;gap:var(--sp4);flex-wrap:wrap;">
+        <div><div style="font-size:10px;color:var(--txm);margin-bottom:4px;">Se&ntilde;al</div>
+          <select id="fSig" style="background:var(--sfo);border:1px solid var(--brd);border-radius:var(--r-md);padding:6px 10px;font-size:12px;color:var(--tx);">
+            <option value="all">Todas</option><option value="COMPRAR">Comprar</option><option value="MANTENER">Mantener</option><option value="VENDER">Vender</option>
+          </select></div>
+        <div><div style="font-size:10px;color:var(--txm);margin-bottom:4px;">Sector</div>
+          <select id="fSect" style="background:var(--sfo);border:1px solid var(--brd);border-radius:var(--r-md);padding:6px 10px;font-size:12px;color:var(--tx);">
+            <option value="all">Todos</option><option>Tecnolog&iacute;a</option><option>Finanzas</option><option>Salud</option><option>Consumo</option><option>Energ&iacute;a</option>
+          </select></div>
+        <div><div style="font-size:10px;color:var(--txm);margin-bottom:4px;">Score m&iacute;nimo</div>
+          <select id="fSc" style="background:var(--sfo);border:1px solid var(--brd);border-radius:var(--r-md);padding:6px 10px;font-size:12px;color:var(--tx);">
+            <option value="0">Cualquiera</option><option value="50">50+</option><option value="60">60+</option><option value="70">70+</option><option value="80">80+</option>
+          </select></div>
+      </div>
+    </div>
+    <div id="screenerRes"></div>
+  </div>
+
+  <!-- PLANES -->
+  <div class="page" id="page-planes">
+    <div class="ph"><div><div class="ph-title">Planes</div><div class="ph-sub">Asciende tus inversiones con Ascendia Scanner &mdash; cancela cuando quieras</div></div></div>
+    <div class="plans-grid">
+      <!-- FREE -->
+      <div class="plan-card">
+        <div class="plan-name">Free</div>
+        <div class="plan-price">0<span style="font-size:16px;">€</span></div>
+        <div class="plan-per">30 d&iacute;as &middot; luego se limita</div>
+        <hr class="plan-divider">
+        <ul class="plan-features">
+          <li><span class="feat-ok">&#x2713;</span> 2 an&aacute;lisis por semana</li>
+          <li><span class="feat-ok">&#x2713;</span> 20 tickers en watchlist</li>
+          <li><span class="feat-ok">&#x2713;</span> 1 se&ntilde;al semanal visible</li>
+          <li><span class="feat-ok">&#x2713;</span> Extras con 24h de retraso</li>
+          <li><span class="feat-no">&#x2715;</span> Screener avanzado</li>
+          <li><span class="feat-no">&#x2715;</span> Alertas en tiempo real</li>
+          <li><span class="feat-no">&#x2715;</span> Seguimiento completo se&ntilde;ales</li>
+        </ul>
+        <button class="plan-btn">Plan actual</button>
+      </div>
+      <!-- AS -->
+      <div class="plan-card">
+        <div class="plan-name">AS</div>
+        <div class="plan-price">7<span style="font-size:16px;">€</span></div>
+        <div class="plan-per">por mes &middot; indefinido</div>
+        <hr class="plan-divider">
+        <ul class="plan-features">
+          <li><span class="feat-ok">&#x2713;</span> 30 an&aacute;lisis al mes</li>
+          <li><span class="feat-ok">&#x2713;</span> 50 tickers en watchlist</li>
+          <li><span class="feat-ok">&#x2713;</span> M&aacute;x 1 se&ntilde;al al d&iacute;a</li>
+          <li><span class="feat-ok">&#x2713;</span> Se&ntilde;ales en tiempo real</li>
+          <li><span class="feat-ok">&#x2713;</span> Seguimiento activo</li>
+          <li><span class="feat-no">&#x2715;</span> Screener avanzado</li>
+          <li><span class="feat-no">&#x2715;</span> Conexi&oacute;n MT5</li>
+        </ul>
+        <button class="plan-btn">Empezar AS</button>
+      </div>
+      <!-- CEND -->
+      <div class="plan-card featured">
+        <div class="plan-badge">M&aacute;s popular</div>
+        <div class="plan-name">CEND</div>
+        <div class="plan-price">12<span style="font-size:16px;">€</span></div>
+        <div class="plan-per">por mes &middot; indefinido</div>
+        <hr class="plan-divider">
+        <ul class="plan-features">
+          <li><span class="feat-ok">&#x2713;</span> An&aacute;lisis ilimitados</li>
+          <li><span class="feat-ok">&#x2713;</span> 200 tickers en watchlist</li>
+          <li><span class="feat-ok">&#x2713;</span> M&aacute;x 3 se&ntilde;ales al d&iacute;a</li>
+          <li><span class="feat-ok">&#x2713;</span> Screener completo</li>
+          <li><span class="feat-ok">&#x2713;</span> Alertas email + push</li>
+          <li><span class="feat-ok">&#x2713;</span> Insiders reales (SEC)</li>
+          <li><span class="feat-no">&#x2715;</span> Conexi&oacute;n MT5</li>
+        </ul>
+        <button class="plan-btn primary">Empezar CEND</button>
+      </div>
+      <!-- DIA -->
+      <div class="plan-card">
+        <div class="plan-name">DIA</div>
+        <div class="plan-price">30<span style="font-size:16px;">€</span></div>
+        <div class="plan-per">por mes &middot; traders serios</div>
+        <hr class="plan-divider">
+        <ul class="plan-features">
+          <li><span class="feat-ok">&#x2713;</span> An&aacute;lisis ilimitados</li>
+          <li><span class="feat-ok">&#x2713;</span> Tickers ilimitados</li>
+          <li><span class="feat-ok">&#x2713;</span> M&aacute;x 5 se&ntilde;ales al d&iacute;a</li>
+          <li><span class="feat-ok">&#x2713;</span> Todo lo del plan CEND</li>
+          <li><span class="feat-ok">&#x2713;</span> Conexi&oacute;n MetaTrader 5</li>
+          <li><span class="feat-ok">&#x2713;</span> Ejecuci&oacute;n &oacute;rdenes desde app</li>
+          <li><span class="feat-ok">&#x2713;</span> Gesti&oacute;n riesgo autom&aacute;tica</li>
+        </ul>
+        <button class="plan-btn">Empezar DIA</button>
+      </div>
+    </div>
+    <div class="disclaimer">
+      <strong>&#x26A0; Aviso legal:</strong> Ascendia Scanner es una herramienta de an&aacute;lisis e informaci&oacute;n con fines <strong>exclusivamente educativos</strong>. Las se&ntilde;ales y an&aacute;lisis generados por inteligencia artificial no constituyen asesoramiento financiero, recomendaci&oacute;n de inversi&oacute;n ni oferta de compra o venta de activos. Toda decisi&oacute;n de inversi&oacute;n es <strong>responsabilidad exclusiva del usuario</strong>. Invertir conlleva riesgo de p&eacute;rdida de capital.
+    </div>
+  </div>
+
+</main>
+</div>
+
+<div class="disc-footer">
+  &#x26A0; Ascendia Scanner &mdash; Herramienta educativa. No constituye asesoramiento financiero. Toda decisi&oacute;n de inversi&oacute;n es responsabilidad del usuario. Invertir conlleva riesgo de p&eacute;rdida de capital.
+</div>
+
+<script>
+var wl=JSON.parse(localStorage.getItem('asc_wl')||'[]');
+var current=null;
+var anHoy=parseInt(localStorage.getItem('asc_an')||'0');
+var STEPS=['Buscando precio actual en mercados...','Calculando indicadores t\u00e9cnicos...','Analizando fundamentales...','Revisando insiders y noticias...','Generando an\u00e1lisis con IA...'];
+var SCRDATA=[
+  {t:'AAPL',n:'Apple Inc.',s:'Tecnolog\u00eda',sig:'COMPRAR',sc:74,pe:32.4,rsi:54,cap:'$3.21T',chg:1.2},
+  {t:'NVDA',n:'NVIDIA Corp.',s:'Tecnolog\u00eda',sig:'COMPRAR',sc:82,pe:45.2,rsi:42,cap:'$2.64T',chg:2.8},
+  {t:'MSFT',n:'Microsoft Corp.',s:'Tecnolog\u00eda',sig:'COMPRAR',sc:71,pe:36.1,rsi:51,cap:'$3.10T',chg:0.6},
+  {t:'AMD',n:'Advanced Micro',s:'Tecnolog\u00eda',sig:'COMPRAR',sc:76,pe:29.4,rsi:38,cap:'$246B',chg:3.1},
+  {t:'GOOGL',n:'Alphabet Inc.',s:'Tecnolog\u00eda',sig:'COMPRAR',sc:66,pe:22.1,rsi:52,cap:'$2.04T',chg:0.9},
+  {t:'AMZN',n:'Amazon.com',s:'Consumo',sig:'COMPRAR',sc:68,pe:41.0,rsi:49,cap:'$2.15T',chg:1.5},
+  {t:'JPM',n:'JPMorgan Chase',s:'Finanzas',sig:'COMPRAR',sc:70,pe:13.2,rsi:48,cap:'$695B',chg:0.4},
+  {t:'TSLA',n:'Tesla Inc.',s:'Consumo',sig:'MANTENER',sc:48,pe:68.2,rsi:58,cap:'$798B',chg:-0.6},
+  {t:'NFLX',n:'Netflix Inc.',s:'Consumo',sig:'MANTENER',sc:55,pe:44.8,rsi:61,cap:'$406B',chg:-0.3},
+  {t:'JNJ',n:'Johnson & Johnson',s:'Salud',sig:'MANTENER',sc:52,pe:16.2,rsi:45,cap:'$385B',chg:0.1},
+  {t:'XOM',n:'Exxon Mobil',s:'Energ\u00eda',sig:'MANTENER',sc:50,pe:14.8,rsi:53,cap:'$496B',chg:-0.7},
+  {t:'META',n:'Meta Platforms',s:'Tecnolog\u00eda',sig:'VENDER',sc:32,pe:27.8,rsi:74,cap:'$1.52T',chg:-1.9}
+];
+
+function qs(id){return document.getElementById(id);}
+
+function acceptDisc(){
+  qs('discModal').style.display='none';
+  localStorage.setItem('asc_disc','1');
+}
+
+function toggleTheme(){
+  var h=document.documentElement;
+  h.setAttribute('data-theme',h.getAttribute('data-theme')==='dark'?'light':'dark');
+}
+
+function navTo(p){
+  document.querySelectorAll('.page').forEach(function(x){x.classList.remove('active');});
+  document.querySelectorAll('.nav-item').forEach(function(x){x.classList.remove('active');});
+  qs('page-'+p).classList.add('active');
+  var n=qs('nav-'+p);
+  if(n)n.classList.add('active');
+  if(p==='home')updateHome();
+  if(p==='watchlist')renderWl();
+  if(p==='screener')runScreener();
+}
+
+function updateHome(){
+  var now=new Date();
+  qs('homeDate').textContent=now.toLocaleDateString('es-ES',{weekday:'long',year:'numeric',month:'long',day:'numeric'});
+  qs('kpiAn').textContent=anHoy;
+  qs('kpiWl').textContent=wl.length;
+  qs('wl-cnt').textContent=wl.length;
+  var buys=wl.filter(function(w){return w.signal==='COMPRAR';}).length;
+  qs('kpiBuy').textContent=buys||'\u2014';
+  if(current){qs('kpiLast').textContent=current.ticker;qs('kpiLastSig').textContent=current.signal;}
+  var hwl=qs('homeWl');
+  if(wl.length===0){hwl.innerHTML='<div style="text-align:center;padding:var(--sp8);color:var(--txm);font-size:12px;">Watchlist vac\u00eda. <button onclick="navTo(\'scanner\')" style="color:var(--pr);text-decoration:underline;cursor:pointer;background:none;border:none;font:inherit;">Analiza un ticker</button> para empezar.</div>';}
+  else{hwl.innerHTML=wl.slice(0,5).map(wlHtml).join('');}
+}
+
+async function startScan(){
+  var ticker=qs('scanInput').value.trim().toUpperCase();
+  if(!ticker)return;
+  qs('loadBox').classList.add('show');
+  qs('errBox').classList.remove('show');
+  qs('results').classList.remove('show');
+  qs('scanBtn').disabled=true;
+  qs('loadSteps').innerHTML='';
+  var si=0;
+  var iv=setInterval(function(){
+    if(si<STEPS.length){
+      qs('loadTxt').textContent=STEPS[si];
+      var el=document.createElement('div');
+      el.className='lst';
+      el.textContent='\u2713 '+STEPS[si];
+      qs('loadSteps').appendChild(el);
+      si++;
+    }
+  },700);
+  try{
+    var today=new Date().toLocaleDateString('es-ES',{day:'2-digit',month:'long',year:'numeric'});
+    var prompt='Eres un analista burs\u00e1til profesional. Usa web search para obtener el precio REAL de hoy '+today+' del ticker '+ticker+' en la bolsa americana.\n\nDevuelve SOLO JSON v\u00e1lido sin markdown:\n{"valid":true,"name":"nombre","sector":"sector","exchange":"NASDAQ","price":185.50,"priceDate":"fecha","changePercent":1.25,"changeAbs":2.30,"open":183.20,"high":186.90,"low":182.10,"prevClose":183.20,"volume":"52.3M","marketCap":"2.85T","pe":28.5,"forwardPE":24.2,"eps":6.42,"high52":237.23,"low52":164.08,"beta":1.24,"dividendYield":"0.52%","score":72,"signal":"COMPRAR","rsi":54.3,"rsiSignal":"NEUTRO","rsiType":"neut","sma20":181.50,"sma20Signal":"POR ENCIMA","sma20Type":"bull","sma50":175.30,"sma50Signal":"POR ENCIMA","sma50Type":"bull","macd":2.15,"macdSignal":"ALCISTA","macdType":"bull","bollUpper":192.0,"bollLower":171.0,"atr":4.2,"volRelative":"1.3x media","soporte":178.0,"resistencia":195.0,"tendencia":"ALCISTA","insiders":[{"nombre":"nombre real","cargo":"CEO","tipo":"VENTA","valor":"$8.2M","fecha":"Mar 2025"},{"nombre":"nombre real","cargo":"CFO","tipo":"COMPRA","valor":"$1.1M","fecha":"Feb 2025"}],"noticias":[{"titulo":"noticia real reciente de '+ticker+'","fuente":"Bloomberg","sentimiento":"POSITIVO","sentType":"pos"},{"titulo":"segunda noticia","fuente":"Reuters","sentimiento":"NEUTRO","sentType":"neu"},{"titulo":"tercera noticia","fuente":"WSJ","sentimiento":"POSITIVO","sentType":"pos"}],"analisisIA":"ESTADO T\u00c9CNICO\\nDescripci\u00f3n detallada con precio real, RSI, MACD, SMAs, Bollinger, soporte y resistencia.\\n\\nFUNDAMENTALES\\nPER, EPS, capitalizaci\u00f3n y comparaci\u00f3n con sector.\\n\\nCATALIZADORES Y RIESGOS\\nFactores clave pr\u00f3ximas semanas.\\n\\nCONCLUSI\u00d3N\\nSe\u00f1al: COMPRAR/VENDER/MANTENER. Precio objetivo 3 meses. Stop loss sugerido. Fines educativos.","priceHistory":[170,172,168,175,173,178,176,180,179,182,180,184,183,185,184,186,185,188,186,189,187,190,188,185,183,187,192,189,195,185]}\n\nSi '+ticker+' no existe: {"valid":false,"error":"Ticker no encontrado"}\nScore >60=COMPRAR, <35=VENDER, resto=MANTENER. USA WEB SEARCH.';
+    var res=await fetch('/.netlify/functions/analyze',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({messages:[{role:'user',content:prompt}]})});
+    var json=await res.json();
+    var tb=(json.content||[]).find(function(b){return b.type==='text';});
+    var raw=tb?tb.text:'';
+    var m=raw.match(/\{[\s\S]*\}/);
+    if(!m)throw new Error('No se pudo procesar. Int\u00e9ntalo de nuevo.');
+    var d=JSON.parse(m[0]);
+    if(!d.valid)throw new Error(d.error||'Ticker no v\u00e1lido');
+    clearInterval(iv);
+    d.ticker=ticker;
+    current=d;
+    anHoy++;
+    localStorage.setItem('asc_an',anHoy);
+    renderResults(d);
+  }catch(e){
+    clearInterval(iv);
+    qs('loadBox').classList.remove('show');
+    qs('errBox').classList.add('show');
+    qs('errBox').textContent='\u26a0 '+e.message;
+  }finally{
+    qs('scanBtn').disabled=false;
+  }
+}
+
+function renderResults(d){
+  qs('loadBox').classList.remove('show');
+  var sig=d.signal||'MANTENER';
+  var sc=sig==='COMPRAR'?'buy':sig==='VENDER'?'sell':'hold';
+  var cc=d.changePercent>=0?'var(--gr)':'var(--rd)';
+  var arr=d.changePercent>=0?'\u25b2':'\u25bc';
+  qs('rTicker').textContent=d.ticker;
+  qs('rName').textContent=(d.name||'')+' \u00b7 '+(d.exchange||'')+' \u00b7 '+(d.sector||'');
+  qs('rPrice').textContent='$'+parseFloat(d.price).toFixed(2);
+  qs('rChg').innerHTML='<span style="color:'+cc+'">'+arr+' '+Math.abs(d.changePercent).toFixed(2)+'% hoy \u00b7 '+(d.priceDate||'')+'</span>';
+  qs('rMeta').innerHTML=[d.marketCap?'<span class="meta-chip">Cap: '+d.marketCap+'</span>':'',d.volume?'<span class="meta-chip">Vol: '+d.volume+'</span>':'',d.beta?'<span class="meta-chip">Beta: '+d.beta+'</span>':'',d.dividendYield?'<span class="meta-chip">Div: '+d.dividendYield+'</span>':''].join('');
+  qs('sigBadge').className='sig-badge '+sc;
+  qs('sigTxt').textContent=sig;
+  qs('sigTxt').className='sig-txt '+sc;
+  qs('sigSc').textContent='Puntuaci\u00f3n: '+d.score+'/100';
+  var fill=qs('scFill');fill.className='sc-fill '+sc;
+  setTimeout(function(){fill.style.width=d.score+'%';},200);
+  var techR=[
+    {l:'RSI (14)',v:d.rsi,sig:d.rsiSignal,t:d.rsiType},
+    {l:'SMA 20',v:'$'+parseFloat(d.sma20).toFixed(2),sig:d.sma20Signal,t:d.sma20Type},
+    {l:'SMA 50',v:'$'+parseFloat(d.sma50).toFixed(2),sig:d.sma50Signal,t:d.sma50Type},
+    {l:'MACD',v:parseFloat(d.macd).toFixed(2),sig:d.macdSignal,t:d.macdType},
+    {l:'Bollinger Sup.',v:'$'+d.bollUpper},
+    {l:'Bollinger Inf.',v:'$'+d.bollLower},
+    {l:'ATR (14)',v:'$'+d.atr},
+    {l:'Tendencia',v:d.tendencia,t:d.tendencia==='ALCISTA'?'bull':'bear'},
+    {l:'Soporte clave',v:'$'+d.soporte,t:'bull'},
+    {l:'Resistencia',v:'$'+d.resistencia,t:'bear'},
+    {l:'M\u00e1x 52 sem',v:'$'+d.high52},
+    {l:'M\u00edn 52 sem',v:'$'+d.low52}
+  ];
+  qs('rTech').innerHTML=techR.map(function(r,i,a){return '<div class="ind-row"><span class="ind-l">'+r.l+'</span><span class="ind-v">'+(r.v||'\u2014')+'</span>'+(r.sig?'<span class="ind-b '+(r.t||'neut')+'">'+r.sig+'</span>':'')+'</div>';}).join('');
+  var fundR=[
+    {l:'Cap. Mercado',v:d.marketCap},
+    {l:'PER (TTM)',v:d.pe,c:d.pe<25?'var(--gr)':d.pe>50?'var(--rd)':null},
+    {l:'PER Forward',v:d.forwardPE,c:d.forwardPE<22?'var(--gr)':null},
+    {l:'EPS (TTM)',v:d.eps?'$'+d.eps:null,c:'var(--gr)'},
+    {l:'Beta',v:d.beta},
+    {l:'Dividendo',v:d.dividendYield||'N/A'},
+    {l:'Apertura',v:d.open?'$'+d.open:null},
+    {l:'Rango d\u00eda',v:d.low&&d.high?'$'+d.low+' \u2013 $'+d.high:null},
+    {l:'Cierre anterior',v:d.prevClose?'$'+d.prevClose:null}
+  ];
+  qs('rFund').innerHTML=fundR.map(function(r){return '<div class="ind-row"><span class="ind-l">'+r.l+'</span><span class="ind-v"'+(r.c?' style="color:'+r.c+'"':'')+'>'+((r.v!=null&&r.v!=='')?r.v:'\u2014')+'</span></div>';}).join('');
+  if(d.priceHistory&&d.priceHistory.length){
+    var pts=d.priceHistory,mn=Math.min.apply(null,pts),mx=Math.max.apply(null,pts),rng=mx-mn||1,W=800,H=130;
+    var coords=pts.map(function(v,i){return (i/(pts.length-1))*W+','+(H-((v-mn)/rng)*(H-16)-8);}).join(' ');
+    qs('rChart').innerHTML='<svg viewBox="0 0 '+W+' '+H+'" style="width:100%;height:130px;display:block;" preserveAspectRatio="none"><defs><linearGradient id="cg" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="var(--pr)" stop-opacity="0.3"/><stop offset="100%" stop-color="var(--pr)" stop-opacity="0"/></linearGradient></defs><polygon points="0,'+H+' '+coords+' '+W+','+H+'" fill="url(#cg)"/><polyline points="'+coords+'" fill="none" stroke="var(--pr)" stroke-width="1.5"/></svg>';
+  }
+  qs('rIns').innerHTML=(d.insiders||[]).map(function(ins){var b=ins.tipo==='COMPRA';return '<div class="ins-item"><div class="ins-top"><div><div class="ins-name">'+ins.nombre+'</div><div class="ins-role">'+ins.cargo+' \u00b7 '+ins.fecha+'</div></div><div style="text-align:right"><span class="ins-b '+(b?'buy':'sell')+'">'+(b?'\u25b2':'\u25bc')+' '+ins.tipo+'</span><div class="ins-val">'+ins.valor+'</div></div></div></div>';}).join('');
+  qs('rNews').innerHTML=(d.noticias||[]).map(function(n){return '<div class="news-item"><div class="news-ttl">'+n.titulo+'</div><div class="news-meta"><span class="news-src">'+n.fuente+'</span><span class="news-sent '+(n.sentType||'neu')+'">'+n.sentimiento+'</span></div></div>';}).join('');
+  qs('rAI').textContent=d.analisisIA||'An\u00e1lisis no disponible.';
+  qs('results').classList.add('show');
+  qs('results').scrollIntoView({behavior:'smooth',block:'start'});
+}
+
+function addToWl(){
+  if(!current)return;
+  var ex=wl.find(function(w){return w.ticker===current.ticker;});
+  if(!ex){
+    wl.push({ticker:current.ticker,name:current.name,price:current.price,changePercent:current.changePercent,signal:current.signal,score:current.score,sector:current.sector});
+    localStorage.setItem('asc_wl',JSON.stringify(wl));
+    qs('addWlBtn').textContent='\u2605 En Watchlist';
+    qs('wl-cnt').textContent=wl.length;
+  }
+}
+
+function removeFromWl(t){
+  wl=wl.filter(function(w){return w.ticker!==t;});
+  localStorage.setItem('asc_wl',JSON.stringify(wl));
+  renderWl();
+  qs('wl-cnt').textContent=wl.length;
+}
+
+function wlHtml(w){
+  var sc=w.signal==='COMPRAR'?'buy':w.signal==='VENDER'?'sell':'hold';
+  var cc=parseFloat(w.changePercent)>=0?'var(--gr)':'var(--rd)';
+  return '<div class="wl-item" onclick="qs(\'scanInput\').value=\''+w.ticker+'\';navTo(\'scanner\');startScan();">'
+    +'<div style="min-width:55px"><div class="wl-ticker">'+w.ticker+'</div><div class="wl-name">'+(w.name||'').substring(0,18)+'</div></div>'
+    +'<div style="flex:1;padding:0 var(--sp4)"><span class="sig-pill '+sc+'">'+w.signal+'</span></div>'
+    +'<div style="text-align:right"><div class="wl-price">$'+parseFloat(w.price).toFixed(2)+'</div><div class="wl-chg" style="color:'+cc+'">'+(parseFloat(w.changePercent)>=0?'+':'')+parseFloat(w.changePercent).toFixed(2)+'%</div></div>'
+    +'<button onclick="event.stopPropagation();removeFromWl(\''+w.ticker+'\')" style="margin-left:var(--sp3);color:var(--txm);padding:4px 8px;font-size:16px;">\u00d7</button>'
+    +'</div>';
+}
+
+function renderWl(){
+  qs('wl-cnt').textContent=wl.length;
+  var c=qs('wlContent');
+  if(wl.length===0){c.innerHTML='<div style="text-align:center;padding:var(--sp8);color:var(--txm);font-size:12px;">Watchlist vac\u00eda.</div>';return;}
+  c.innerHTML='<div style="font-size:11px;color:var(--txm);margin-bottom:var(--sp3);">'+wl.length+' ticker'+(wl.length>1?'s':'')+' \u00b7 Clic para analizar</div>'+wl.map(wlHtml).join('');
+}
+
+function runScreener(){
+  var sf=qs('fSig').value,se=qs('fSect').value,sm=parseInt(qs('fSc').value);
+  var f=SCRDATA.filter(function(t){
+    if(sf!=='all'&&t.sig!==sf)return false;
+    if(se!=='all'&&t.s!==se)return false;
+    if(t.sc<sm)return false;
+    return true;
+  });
+  var pill=function(s){var c=s==='COMPRAR'?'buy':s==='VENDER'?'sell':'hold';return '<span class="sig-pill '+c+'" style="font-size:9px;padding:2px 8px;">'+s+'</span>';};
+  qs('screenerRes').innerHTML='<div class="scanner-wrap"><table class="st"><thead><tr><th>Ticker</th><th>Nombre</th><th>Sector</th><th>Se\u00f1al</th><th>Score</th><th>RSI</th><th>PER</th><th>Cap.</th><th>Hoy</th><th></th></tr></thead><tbody>'
+    +f.map(function(t){return '<tr onclick="qs(\'scanInput\').value=\''+t.t+'\';navTo(\'scanner\');startScan();">'
+    +'<td style="font-weight:700;font-family:var(--mono)">'+t.t+'</td><td style="color:var(--txm)">'+t.n+'</td><td style="color:var(--txm)">'+t.s+'</td>'
+    +'<td>'+pill(t.sig)+'</td><td style="font-family:var(--mono)">'+t.sc+'</td>'
+    +'<td style="font-family:var(--mono);color:'+(t.rsi<30?'var(--gr)':t.rsi>70?'var(--rd)':'var(--tx)')+'">'+t.rsi+'</td>'
+    +'<td style="font-family:var(--mono)">'+t.pe+'</td><td style="font-family:var(--mono)">'+t.cap+'</td>'
+    +'<td style="font-family:var(--mono);color:'+(t.chg>=0?'var(--gr)':'var(--rd)')+'">'+(t.chg>=0?'+':'')+t.chg+'%</td>'
+    +'<td><button onclick="event.stopPropagation();qs(\'scanInput\').value=\''+t.t+'\';navTo(\'scanner\');startScan();" style="color:var(--pr);font-size:11px;font-weight:600;">Analizar \u2192</button></td>'
+    +'</tr>';}).join('')
+    +'</tbody></table><div style="padding:var(--sp3) var(--sp4);font-size:11px;color:var(--txm);border-top:1px solid var(--div);">'+f.length+' resultados \u00b7 Clic en fila para an\u00e1lisis completo</div></div>';
+}
+
+document.addEventListener('DOMContentLoaded',function(){
+  if(!localStorage.getItem('asc_disc')){
+    qs('discModal').style.display='flex';
+  }
+  updateHome();
+  runScreener();
+  qs('scanInput').addEventListener('keydown',function(e){if(e.key==='Enter')startScan();});
+  qs('scanInput').addEventListener('input',function(e){e.target.value=e.target.value.toUpperCase();});
+});
+</script>
+</body>
+</html>
